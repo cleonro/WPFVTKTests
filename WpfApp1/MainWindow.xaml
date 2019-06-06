@@ -14,7 +14,8 @@
 			<MenuItem Header="File" Height="100" Width="100" Click="File_Click" FontSize="24">
 				<MenuItem Header="Start" x:Name="startMenu"  HorizontalAlignment="Center" Height="68" Width="177" Click="MenuItem_Click" Margin="10,0,4,0"/>
 			</MenuItem>
-		</Menu>
+            <Label x:Name="label1" Content="0" FontSize="18" Width="1063"/>
+        </Menu>
 		<WindowsFormsHost x:Name="wfh" Margin="127,179,99,70.5" Background="Blue">
 			<!-- <vtk:RenderWindowControl x:Name="_renderControl" /> -->
 		</WindowsFormsHost>

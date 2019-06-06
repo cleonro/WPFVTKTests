@@ -26,7 +26,7 @@ namespace WpfApp1
         {
             InitializeComponent();
 
-            m_timer = new System.Timers.Timer(1000 / 60);
+            m_timer = new System.Timers.Timer(1000 / 10);
             m_timer.Elapsed += this.OnTimer;
         }
 
@@ -52,7 +52,7 @@ namespace WpfApp1
         private void InitializeVTK()
         {
             Kitware.VTK.RenderWindowControl rw = new Kitware.VTK.RenderWindowControl();
-            rw.AddTestActors = true;
+            rw.AddTestActors = false;
             rw.Dock = System.Windows.Forms.DockStyle.Fill;
             wfh.Child = rw;
             wfh.Visibility = System.Windows.Visibility.Visible;
@@ -142,6 +142,13 @@ namespace WpfApp1
 
         private void UpdateVTK()
         {
+            string cs = this.label1.Content.ToString();
+            int ci = int.Parse(cs);
+            ci += 1;
+            cs = ci.ToString();
+            this.label1.Content = cs;
+
+            
             m_elt += m_step;
             double x = 0.0 + 25.0 * Math.Cos(m_elt);
             double y = 25.0 + 25.0 * Math.Sin(m_elt);
@@ -149,8 +156,11 @@ namespace WpfApp1
 
             m_sa.SetPosition(x, y, z);
 
-            RenderWindowControl rw = this.RenderWindow();
-            rw.Refresh();
+            //RenderWindowControl rw = this.RenderWindow();
+            //rw.Refresh();
+
+            vtkRenderer r = this.Renderer();
+            r.GetRenderWindow().Render();
         }
 
         private delegate void UpdateGr();
