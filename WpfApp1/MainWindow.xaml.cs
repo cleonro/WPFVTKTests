@@ -159,8 +159,9 @@ namespace WpfApp1
             //RenderWindowControl rw = this.RenderWindow();
             //rw.Refresh();
 
-            vtkRenderer r = this.Renderer();
-            r.GetRenderWindow().Render();
+            //vtkRenderer r = this.Renderer();
+            //r.GetRenderWindow().Render();
+            this.RenderWindow().RenderWindow.Render();
         }
 
         private delegate void UpdateGr();
