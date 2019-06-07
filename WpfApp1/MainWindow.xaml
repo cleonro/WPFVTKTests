@@ -16,7 +16,7 @@
 			</MenuItem>
             <Label x:Name="label1" Content="0" FontSize="18" Width="1063"/>
         </Menu>
-		<WindowsFormsHost x:Name="wfh" Margin="127,179,99,70.5" Background="Blue">
+		<WindowsFormsHost x:Name="wfh" Margin="0,100,0,-0.5" Background="Blue">
 			<!-- <vtk:RenderWindowControl x:Name="_renderControl" /> -->
 		</WindowsFormsHost>
 		<Label FontSize="18" x:Name="label" Content="VTK 0.0.0" HorizontalAlignment="Left" Margin="1172,40,0,0" VerticalAlignment="Top" Width="168"/>

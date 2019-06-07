@@ -26,13 +26,13 @@ namespace WpfApp1
         {
             InitializeComponent();
 
-            m_timer = new System.Timers.Timer(1000 / 10);
+            m_timer = new System.Timers.Timer(1000 / 100);
             m_timer.Elapsed += this.OnTimer;
         }
 
         private void File_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("Menu clicked!");
+            
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -51,62 +51,30 @@ namespace WpfApp1
 
         private void InitializeVTK()
         {
-            Kitware.VTK.RenderWindowControl rw = new Kitware.VTK.RenderWindowControl();
-            rw.AddTestActors = false;
-            rw.Dock = System.Windows.Forms.DockStyle.Fill;
-            wfh.Child = rw;
-            wfh.Visibility = System.Windows.Visibility.Visible;
-            Kitware.VTK.vtkRendererCollection rs = rw.RenderWindow.GetRenderers();
-            int rsc = rs.GetNumberOfItems();
-            Console.WriteLine(rsc + " renderers");
-            Kitware.VTK.vtkRenderer r = rs.GetFirstRenderer();
-            r.SetBackground(0.1, 0.3, 0.7);
-            r.SetBackground2(0.7, 0.8, 1.0);
-            r.SetGradientBackground(true);
-
-            Kitware.VTK.vtkAxesActor axa = new Kitware.VTK.vtkAxesActor();
-            r.AddActor(axa);
-
+            //vtk version
             string vtkVersion = Kitware.VTK.vtkVersion.GetVTKVersion();
             vtkVersion = "VTK " + vtkVersion;
             Console.WriteLine(vtkVersion);
 
             this.label.Content = vtkVersion;
 
-            axa.SetTotalLength(50.0, 50.0, 50.0);
-            axa.SetConeRadius(0.1);
-            //axa.SetAxisLabels(0);
+            //vtk scene
+            m_scene = new SceneVTK();
+            m_scene.Initialize(wfh);
 
-            axa.GetXAxisCaptionActor2D().GetTextActor().SetTextScaleMode((int)Kitware.VTK.vtkTextActor.TEXT_SCALE_MODE_NONE_WrapperEnum.TEXT_SCALE_MODE_NONE);
-            axa.GetXAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(32);
-            axa.GetYAxisCaptionActor2D().GetTextActor().SetTextScaleMode((int)Kitware.VTK.vtkTextActor.TEXT_SCALE_MODE_NONE_WrapperEnum.TEXT_SCALE_MODE_NONE);
-            axa.GetYAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(32);
-            axa.GetZAxisCaptionActor2D().GetTextActor().SetTextScaleMode((int)Kitware.VTK.vtkTextActor.TEXT_SCALE_MODE_NONE_WrapperEnum.TEXT_SCALE_MODE_NONE);
-            axa.GetZAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(32);
+            //add axes
+            vtkRenderer r = m_scene.Renderer();
+            vtkAxesActor axa = SceneVTK.CreateAxesActor(50.0, 0.1, false);
+            r.AddActor(axa);
 
-            m_sa = this.CreateSphereActor(10.0);
+            //add sphere actor
+            m_sa = SceneVTK.CreateSphereActor(10.0);
             r.AddActor(m_sa);
 
             m_sa.SetPosition(25.0, 25.0, 25.0);
-        }
 
-        private vtkActor CreateSphereActor(double radius)
-        {
-            Kitware.VTK.vtkActor a = new Kitware.VTK.vtkActor();
-
-            vtkSphereSource sphereSource3D = new vtkSphereSource();
-            sphereSource3D.SetCenter(0.0, 0.0, 0.0);
-            sphereSource3D.SetRadius(radius);
-            sphereSource3D.SetThetaResolution(10);
-            sphereSource3D.SetPhiResolution(10);
-
-            vtkPolyDataMapper sphereMapper3D = vtkPolyDataMapper.New();
-            sphereMapper3D.SetInputConnection(sphereSource3D.GetOutputPort());
-            a.SetMapper(sphereMapper3D);
-            a.GetProperty().SetColor(0.95, 0.5, 0.3);
-            a.GetProperty().SetOpacity(0.5);
-
-            return a;
+            //start scene continuous render
+            m_scene.StartContinuousRender();
         }
 
         private void Window_Initialized(object sender, EventArgs e)
@@ -118,22 +86,7 @@ namespace WpfApp1
         {
             InitializeVTK();
         }
-
-        private RenderWindowControl RenderWindow()
-        {
-            RenderWindowControl rw = (RenderWindowControl)wfh.Child;
-            return rw;
-        }
-
-        private vtkRenderer Renderer()
-        {
-            RenderWindowControl rw = (RenderWindowControl)wfh.Child;
-            vtkRendererCollection rs = rw.RenderWindow.GetRenderers();
-            vtkRenderer r = rs.GetFirstRenderer();
-
-            return r;
-        }
-
+  
         private void OnTimer(Object source, System.Timers.ElapsedEventArgs e)
         {
             UpdateGr u = new UpdateGr(UpdateVTK);
@@ -156,7 +109,7 @@ namespace WpfApp1
 
             m_sa.SetPosition(x, y, z);
 
-            this.RenderWindow().RenderWindow.Render();
+            //m_scene.UpdateScene();
         }
 
         private delegate void UpdateGr();
@@ -169,7 +122,10 @@ namespace WpfApp1
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            m_scene.StopContinuousRender();
             m_timer.Dispose();
         }
+
+        private SceneVTK m_scene;
     }
 }
