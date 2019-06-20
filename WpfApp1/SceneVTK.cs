@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using Kitware.VTK;
 
@@ -65,7 +66,25 @@ namespace WpfApp1
 
         public void UpdateScene()
         {
+            if(m_timer.Enabled && m_countFPS == 0)
+            {
+                m_stopWatch.Start();
+            }
             this.RenderWindow.Render();
+            if (m_timer.Enabled)
+            {
+                ++m_countFPS;
+                if (m_countFPS == m_countFPSMax)
+                {
+                    m_stopWatch.Stop();
+                    long elapsedTime = m_stopWatch.ElapsedMilliseconds;
+                    m_fps = 1000.0 * (m_countFPS + 0.0) / (elapsedTime + 0.0);
+                    string s = (int)m_fps + " FPS";
+                    m_fpsText.SetInput(s);
+                    m_countFPS = 0;
+                    m_stopWatch.Reset();
+                }
+            }
         }
 
         public void Initialize(System.Windows.Forms.Integration.WindowsFormsHost wfh)
@@ -78,11 +97,13 @@ namespace WpfApp1
         {
             m_timer.Interval = 1000.0 / desiredFPS;
             m_timer.Start();
+            m_fpsText.SetVisibility(1);
         }
 
         public void StopContinuousRender()
         {
             m_timer.Stop();
+            m_fpsText.SetVisibility(0);
         }
 
         public bool IsContinuousRendering()
@@ -103,10 +124,20 @@ namespace WpfApp1
             r.SetGradientBackground(true);
 
             m_renderer = r;
+
+            //add fps text actor
+            m_fpsText = new vtkTextActor();
+            m_fpsText.GetTextProperty().SetFontSize(12);
+            m_fpsText.GetTextProperty().SetColor(0.3, 1.0, 0.3);
+            m_fpsText.SetPosition2(5, 15);
+            m_fpsText.SetInput(" FPS");
+            m_renderer.AddActor2D(m_fpsText);
+            m_fpsText.SetVisibility(0);
         }
 
         private void InitializeTimer()
         {
+            m_stopWatch = new Stopwatch();
             m_timer = new System.Timers.Timer(1000.0 / 60);
             m_timer.Elapsed += OnTimer;
         }
@@ -120,5 +151,11 @@ namespace WpfApp1
         private vtkRenderer m_renderer;
         private System.Timers.Timer m_timer;
         private delegate void UpdateSceneFunction();
+
+        int m_countFPS = 0;
+        int m_countFPSMax = 60;
+        double m_fps = 0;
+        Stopwatch m_stopWatch;
+        vtkTextActor m_fpsText;
     }
 }

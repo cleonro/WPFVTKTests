@@ -51,6 +51,12 @@ namespace WpfApp1
 
         private void InitializeVTK()
         {
+            if(m_vtkInitialized)
+            {
+                return;
+            }
+            m_vtkInitialized = true;
+
             //vtk version
             string vtkVersion = Kitware.VTK.vtkVersion.GetVTKVersion();
             vtkVersion = "VTK " + vtkVersion;
@@ -127,5 +133,6 @@ namespace WpfApp1
         }
 
         private SceneVTK m_scene;
+        private bool m_vtkInitialized = false;
     }
 }
